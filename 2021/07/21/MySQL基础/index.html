@@ -8,17 +8,17 @@
   <link rel="dns-prefetch" href="http://example.com">
   <title>MySql基础 | Forever-Mamba</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="##本单元目标 ​    一、为什么要学习数据库">
+  <meta name="description" content="一、为什么要学习数据库">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MySql基础">
 <meta property="og:url" content="http://example.com/2021/07/21/MySQL%E5%9F%BA%E7%A1%80/index.html">
 <meta property="og:site_name" content="Forever-Mamba">
-<meta property="og:description" content="##本单元目标 ​    一、为什么要学习数据库">
+<meta property="og:description" content="一、为什么要学习数据库">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2021-07-21T13:42:34.000Z">
-<meta property="article:modified_time" content="2021-07-21T13:48:51.479Z">
+<meta property="article:modified_time" content="2021-07-28T02:41:56.620Z">
 <meta property="article:author" content="Forever-Mamba">
-<meta property="article:tag" content="java">
+<meta property="article:tag" content="MySql数据库">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternative" href="/atom.xml" title="Forever-Mamba" type="application/atom+xml">
@@ -67,7 +67,7 @@
 			</ul>
 		</nav>
 		<nav>
-    		总文章数 4
+    		总文章数 17
 		</nav>
 		<nav class="header-smart-menu">
     		
@@ -205,8 +205,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>##本单元目标</p>
-<p>​    一、为什么要学习数据库</p>
+        <p>一、为什么要学习数据库</p>
 <span id="more"></span>
 
 <p>​    二、数据库的相关概念<br>​        DBMS、DB、SQL<br>​    三、数据库存储数据的特点<br>​    四、初始MySQL<br>​        MySQL产品的介绍<br>​        MySQL产品的安装          ★<br>​        MySQL服务的启动和停止     ★<br>​        MySQL服务的登录和退出     ★<br>​        MySQL的常见命令和语法规范<br>​    五、DQL语言的学习   ★<br>​        基础查询        ★<br>​        条件查询         ★<br>​        排序查询         ★<br>​        常见函数        ★<br>​        分组函数        ★<br>​        分组查询           ★<br>​        连接查询         ★<br>​        子查询       √<br>​        分页查询       ★<br>​        union联合查询    √<br>​        </p>
@@ -542,6 +541,255 @@ order by 排序的字段|表达式|函数|别名 【asc|desc】
 <p>特点：</p>
 <pre><code>只能放在BEGIN END里面如果要搭配leave跳转语句，需要使用标签，否则可以不用标签leave类似于java中的break语句，跳出所在循环！！！
 </code></pre>
+<h2 id="———————————MYSQL练习———————————"><a href="#———————————MYSQL练习———————————" class="headerlink" title="———————————MYSQL练习———————————"></a>———————————MYSQL练习———————————</h2><p>1、取得每个部门最高薪水的人员名称<br>第一步：取得每个部门最高薪水(按照部门编号分组，找出每一组最大值)<br>mysql&gt; select deptno,max(sal) as maxsal from emp group by deptno;<br>+——–+———+<br>| deptno | maxsal  |<br>+——–+———+<br>|     10 | 5000.00 |<br>|     20 | 3000.00 |<br>|     30 | 2850.00 |<br>+——–+———+<br>第二步：将以上的查询结果当做一张临时表t，<br>t和emp表连接，条件：t.deptno = e.deptno and t.maxsal = e.sal<br>select<br>    e.ename, t.*<br>from<br>    emp e<br>join<br>    (select deptno,max(sal) as maxsal from emp group by deptno) t<br>on<br>    t.deptno = e.deptno and t.maxsal = e.sal;</p>
+<p>+——-+——–+———+<br>| ename | deptno | maxsal  |<br>+——-+——–+———+<br>| BLAKE |     30 | 2850.00 |<br>| SCOTT |     20 | 3000.00 |<br>| KING  |     10 | 5000.00 |<br>| FORD  |     20 | 3000.00 |<br>+——-+——–+———+</p>
+<p>2、哪些人的薪水在部门的平均薪水之上<br>第一步：找出每个部门的平均薪水<br>select deptno,avg(sal) as avgsal from emp group by deptno;<br>+——–+————-+<br>| deptno | avgsal      |<br>+——–+————-+<br>|     10 | 2916.666667 |<br>|     20 | 2175.000000 |<br>|     30 | 1566.666667 |<br>+——–+————-+<br>第二步：将以上查询结果当做t表，t和emp表连接<br>条件：部门编号相同，并且emp的sal大于t表的avgsal<br>select<br>    t.*, e.ename, e.sal<br>from<br>    emp e<br>join<br>    (select deptno,avg(sal) as avgsal from emp group by deptno) t<br>on<br>    e.deptno = t.deptno and e.sal &gt; t.avgsal;<br>+——–+————-+——-+———+<br>| deptno | avgsal      | ename | sal     |<br>+——–+————-+——-+———+<br>|     30 | 1566.666667 | ALLEN | 1600.00 |<br>|     20 | 2175.000000 | JONES | 2975.00 |<br>|     30 | 1566.666667 | BLAKE | 2850.00 |<br>|     20 | 2175.000000 | SCOTT | 3000.00 |<br>|     10 | 2916.666667 | KING  | 5000.00 |<br>|     20 | 2175.000000 | FORD  | 3000.00 |<br>+——–+————-+——-+———+</p>
+<p>3、取得部门中（所有人的）平均的薪水等级</p>
+<pre><code>平均的薪水等级：先计算每一个薪水的等级，然后找出薪水等级的平均值。
+
+平均薪水的等级：先计算平均薪水，然后找出每个平均薪水的等级值。
+
+第一步：找出每个人的薪水等级
+emp e和salgrade s表连接。
+连接条件：e.sal between s.losal and s.hisal
+
+select 
+    e.ename,e.sal,e.deptno,s.grade
+from
+    emp e
+join
+    salgrade s
+on
+    e.sal between s.losal and s.hisal;
+
++--------+---------+--------+-------+
+| ename  | sal     | deptno | grade |
++--------+---------+--------+-------+
+| CLARK  | 2450.00 |     10 |     4 |
+| KING   | 5000.00 |     10 |     5 |
+| MILLER | 1300.00 |     10 |     2 |
+
+| SMITH  |  800.00 |     20 |     1 |
+| ADAMS  | 1100.00 |     20 |     1 |
+| SCOTT  | 3000.00 |     20 |     4 |
+| FORD   | 3000.00 |     20 |     4 |
+| JONES  | 2975.00 |     20 |     4 |
+
+| MARTIN | 1250.00 |     30 |     2 |
+| TURNER | 1500.00 |     30 |     3 |
+| BLAKE  | 2850.00 |     30 |     4 |
+| ALLEN  | 1600.00 |     30 |     3 |
+| JAMES  |  950.00 |     30 |     1 |
+| WARD   | 1250.00 |     30 |     2 |
++--------+---------+--------+-------+
+
+第二步：基于以上的结果继续按照deptno分组，求grade的平均值。
+select 
+    e.deptno,avg(s.grade)
+from
+    emp e
+join
+    salgrade s
+on
+    e.sal between s.losal and s.hisal
+group by
+    e.deptno;
+
++--------+--------------+
+| deptno | avg(s.grade) |
++--------+--------------+
+|     10 |       3.6667 |
+|     20 |       2.8000 |
+|     30 |       2.5000 |
++--------+--------------+
+</code></pre>
+<p>4、不准用组函数（Max ），取得最高薪水</p>
+<p>第一种：sal降序，limit 1<br>select ename,sal from emp order by sal desc limit 1;<br>+——-+———+<br>| ename | sal     |<br>+——-+———+<br>| KING  | 5000.00 |<br>+——-+———+</p>
+<p>第二种方案：select max(sal) from emp;</p>
+<p>第三种方案：表的自连接<br>select sal from emp where sal not in(select distinct a.sal from emp a join emp b on a.sal &lt; b.sal);</p>
+<p>+———+<br>| sal     |<br>+———+<br>| 5000.00 |<br>+———+</p>
+<p>select<br>    distinct a.sal<br>from<br>    emp a<br>join<br>    emp b<br>on<br>    a.sal &lt; b.sal</p>
+<p>a表<br>+———+<br>| sal     |<br>+———+<br>|  800.00 |<br>| 1600.00 |<br>| 1250.00 |<br>| 2975.00 |<br>| 1250.00 |<br>| 2850.00 |<br>| 2450.00 |<br>| 3000.00 |<br>| 5000.00 |<br>| 1500.00 |<br>| 1100.00 |<br>|  950.00 |<br>| 3000.00 |<br>| 1300.00 |<br>+———+</p>
+<p>b表<br>+———+<br>| sal     |<br>+———+<br>|  800.00 |<br>| 1600.00 |<br>| 1250.00 |<br>| 2975.00 |<br>| 1250.00 |<br>| 2850.00 |<br>| 2450.00 |<br>| 3000.00 |<br>| 5000.00 |<br>| 1500.00 |<br>| 1100.00 |<br>|  950.00 |<br>| 3000.00 |<br>| 1300.00 |<br>+———+</p>
+<p>5、取得平均薪水最高的部门的部门编号</p>
+<p>第一种方案：降序取第一个。</p>
+<pre><code>第一步：找出每个部门的平均薪水
+    select deptno,avg(sal) as avgsal from emp group by deptno;
+    +--------+-------------+
+    | deptno | avgsal      |
+    +--------+-------------+
+    |     10 | 2916.666667 |
+    |     20 | 2175.000000 |
+    |     30 | 1566.666667 |
+    +--------+-------------+
+第二步：降序选第一个。
+    select deptno,avg(sal) as avgsal from emp group by deptno order by avgsal desc limit 1;
+    +--------+-------------+
+    | deptno | avgsal      |
+    +--------+-------------+
+    |     10 | 2916.666667 |
+    +--------+-------------+
+</code></pre>
+<p>第二种方案：max</p>
+<pre><code>第一步：找出每个部门的平均薪水
+
+select deptno,avg(sal) as avgsal from emp group by deptno;
++--------+-------------+
+| deptno | avgsal      |
++--------+-------------+
+|     10 | 2916.666667 |
+|     20 | 2175.000000 |
+|     30 | 1566.666667 |
++--------+-------------+
+
+第二步：找出以上结果中avgsal最大的值。
+select max(t.avgsal) from (select avg(sal) as avgsal from emp group by deptno) t;
++---------------+
+| max(t.avgsal) |
++---------------+
+|   2916.666667 |
++---------------+
+
+第三步：
+select 
+    deptno,avg(sal) as avgsal 
+from 
+    emp 
+group by 
+    deptno
+having
+    avgsal = (select max(t.avgsal) from (select avg(sal) as avgsal from emp group by deptno) t);
+
++--------+-------------+
+| deptno | avgsal      |
++--------+-------------+
+|     10 | 2916.666667 |
++--------+-------------+
+</code></pre>
+<p>6、取得平均薪水最高的部门的部门名称</p>
+<p>select<br>    d.dname,avg(e.sal) as avgsal<br>from<br>    emp e<br>join<br>    dept d<br>on<br>    e.deptno = d.deptno<br>group by<br>    d.dname<br>order by<br>    avgsal desc<br>limit<br>    1;</p>
+<p>+————+————-+<br>| dname      | avgsal      |<br>+————+————-+<br>| ACCOUNTING | 2916.666667 |<br>+————+————-+</p>
+<p>7、求平均薪水的等级最低的部门的部门名称</p>
+<p>平均薪水是800<br>平均薪水是900<br>那么他俩都是1级别。</p>
+<p>第一步：找出每个部门的平均薪水<br>select deptno,avg(sal) as avgsal from emp group by deptno;<br>+——–+————-+<br>| deptno | avgsal      |<br>+——–+————-+<br>|     10 | 2916.666667 |<br>|     20 | 2175.000000 |<br>|     30 | 1566.666667 |<br>+——–+————-+</p>
+<p>第二步：找出每个部门的平均薪水的等级<br>以上t表和salgrade表连接，条件：t.avgsal between s.losal and s.hisal</p>
+<p>select<br>    t.*,s.grade<br>from<br>    (select d.dname,avg(sal) as avgsal from emp e join dept d on e.deptno = d.deptno group by d.dname) t<br>join<br>    salgrade s<br>on<br>    t.avgsal between s.losal and s.hisal;</p>
+<p>+————+————-+——-+<br>| dname      | avgsal      | grade |<br>+————+————-+——-+<br>| SALES      | 1566.666667 |     3 |<br>| ACCOUNTING | 2916.666667 |     4 |<br>| RESEARCH   | 2175.000000 |     4 |<br>+————+————-+——-+</p>
+<p>select<br>    t.*,s.grade<br>from<br>    (select d.dname,avg(sal) as avgsal from emp e join dept d on e.deptno = d.deptno group by d.dname) t<br>join<br>    salgrade s<br>on<br>    t.avgsal between s.losal and s.hisal<br>where<br>    s.grade = (select grade from salgrade where (select avg(sal) as avgsal from emp group by deptno order by avgsal asc limit 1) between losal and hisal);</p>
+<p>+——-+————-+——-+<br>| dname | avgsal      | grade |<br>+——-+————-+——-+<br>| SALES | 1566.666667 |     3 |<br>+——-+————-+——-+</p>
+<p>抛开之前的，最低等级你怎么着？<br>    平均薪水最低的对应的等级一定是最低的.<br>    select avg(sal) as avgsal from emp group by deptno order by avgsal asc limit 1;<br>    +————-+<br>    | avgsal      |<br>    +————-+<br>    | 1566.666667 |<br>    +————-+</p>
+<pre><code>select grade from salgrade where (select avg(sal) as avgsal from emp group by deptno order by avgsal asc limit 1) between losal and hisal;
++-------+
+| grade |
++-------+
+|     3 |
++-------+
+</code></pre>
+<p>8、取得比普通员工(员工代码没有在 mgr 字段上出现的) 的最高薪水还要高的领导人姓名</p>
+<pre><code>比“普通员工的最高薪水”还要高的一定是领导！
+    没毛病！！！！
+</code></pre>
+<p>mysql&gt; select distinct mgr from emp where mgr is not null;<br>+——+<br>| mgr  |<br>+——+<br>| 7902 |<br>| 7698 |<br>| 7839 |<br>| 7566 |<br>| 7788 |<br>| 7782 |<br>+——+<br>员工编号没有在以上范围内的都是普通员工。</p>
+<p>第一步：找出普通员工的最高薪水！<br>not in在使用的时候，后面小括号中记得排除NULL。<br>select max(sal) from emp where empno not in(select distinct mgr from emp where mgr is not null);<br>+———-+<br>| max(sal) |<br>+———-+<br>|  1600.00 |<br>+———-+</p>
+<p>第二步：找出高于1600的<br>select ename,sal from emp where sal &gt; (select max(sal) from emp where empno not in(select distinct mgr from emp where mgr is not null));<br>+——-+———+<br>| ename | sal     |<br>+——-+———+<br>| JONES | 2975.00 |<br>| BLAKE | 2850.00 |<br>| CLARK | 2450.00 |<br>| SCOTT | 3000.00 |<br>| KING  | 5000.00 |<br>| FORD  | 3000.00 |<br>+——-+———+</p>
+<p>9、取得薪水最高的前五名员工<br>select ename,sal from emp order by sal desc limit 5;<br>+——-+———+<br>| ename | sal     |<br>+——-+———+<br>| KING  | 5000.00 |<br>| SCOTT | 3000.00 |<br>| FORD  | 3000.00 |<br>| JONES | 2975.00 |<br>| BLAKE | 2850.00 |<br>+——-+———+</p>
+<p>10、取得薪水最高的第六到第十名员工<br>select ename,sal from emp order by sal desc limit 5, 5;<br>+——–+———+<br>| ename  | sal     |<br>+——–+———+<br>| CLARK  | 2450.00 |<br>| ALLEN  | 1600.00 |<br>| TURNER | 1500.00 |<br>| MILLER | 1300.00 |<br>| MARTIN | 1250.00 |<br>+——–+———+</p>
+<p>11、取得最后入职的 5 名员工<br>日期也可以降序，升序。</p>
+<pre><code>select ename,hiredate from emp order by hiredate desc limit 5;
+
++--------+------------+
+| ename  | hiredate   |
++--------+------------+
+| ADAMS  | 1987-05-23 |
+| SCOTT  | 1987-04-19 |
+| MILLER | 1982-01-23 |
+| FORD   | 1981-12-03 |
+| JAMES  | 1981-12-03 |
++--------+------------+
+</code></pre>
+<p>12、取得每个薪水等级有多少员工<br>分组count</p>
+<p>第一步：找出每个员工的薪水等级<br>select<br>    e.ename,e.sal,s.grade<br>from<br>    emp e<br>join<br>    salgrade s<br>on<br>    e.sal between s.losal and s.hisal;<br>+——–+———+——-+<br>| ename  | sal     | grade |<br>+——–+———+——-+<br>| SMITH  |  800.00 |     1 |<br>| ALLEN  | 1600.00 |     3 |<br>| WARD   | 1250.00 |     2 |<br>| JONES  | 2975.00 |     4 |<br>| MARTIN | 1250.00 |     2 |<br>| BLAKE  | 2850.00 |     4 |<br>| CLARK  | 2450.00 |     4 |<br>| SCOTT  | 3000.00 |     4 |<br>| KING   | 5000.00 |     5 |<br>| TURNER | 1500.00 |     3 |<br>| ADAMS  | 1100.00 |     1 |<br>| JAMES  |  950.00 |     1 |<br>| FORD   | 3000.00 |     4 |<br>| MILLER | 1300.00 |     2 |<br>+——–+———+——-+</p>
+<p>第二步：继续按照grade分组统计数量<br>select<br>    s.grade ,count(*)<br>from<br>    emp e<br>join<br>    salgrade s<br>on<br>    e.sal between s.losal and s.hisal<br>group by<br>    s.grade;</p>
+<p>+——-+———-+<br>| grade | count(*) |<br>+——-+———-+<br>|     1 |        3 |<br>|     2 |        3 |<br>|     3 |        2 |<br>|     4 |        5 |<br>|     5 |        1 |<br>+——-+———-+</p>
+<p>13、面试题：<br>有 3 个表 S(学生表)，C（课程表），SC（学生选课表）<br>S（SNO，SNAME）代表（学号，姓名）<br>C（CNO，CNAME，CTEACHER）代表（课号，课名，教师）<br>SC（SNO，CNO，SCGRADE）代表（学号，课号，成绩）<br>问题：<br>1，找出没选过“黎明”老师的所有学生姓名。<br>2，列出 2 门以上（含2 门）不及格学生姓名及平均成绩。<br>3，即学过 1 号课程又学过 2 号课所有学生的姓名。</p>
+<p>14、列出所有员工及领导的姓名<br>select<br>    a.ename ‘员工’, b.ename ‘领导’<br>from<br>    emp a<br>left join<br>    emp b<br>on<br>    a.mgr = b.empno;</p>
+<p>+——–+——-+<br>| 员工   | 领导    |<br>+——–+——-+<br>| SMITH  | FORD  |<br>| ALLEN  | BLAKE |<br>| WARD   | BLAKE |<br>| JONES  | KING  |<br>| MARTIN | BLAKE |<br>| BLAKE  | KING  |<br>| CLARK  | KING  |<br>| SCOTT  | JONES |<br>| KING   | NULL  |<br>| TURNER | BLAKE |<br>| ADAMS  | SCOTT |<br>| JAMES  | BLAKE |<br>| FORD   | JONES |<br>| MILLER | CLARK |<br>+——–+——-+</p>
+<p>15、列出受雇日期早于其直接上级的所有员工的编号,姓名,部门名称<br>emp a 员工表<br>emp b 领导表<br>a.mgr = b.empno and a.hiredate &lt; b.hiredate</p>
+<p>select<br>    a.ename ‘员工’, a.hiredate, b.ename ‘领导’, b.hiredate, d.dname<br>from<br>    emp a<br>join<br>    emp b<br>on<br>    a.mgr = b.empno<br>join<br>    dept d<br>on<br>    a.deptno = d.deptno<br>where<br>     a.hiredate &lt; b.hiredate;</p>
+<p>+——-+————+——-+————+————+<br>| 员工     | hiredate   | 领导    | hiredate   | dname      |<br>+——-+————+——-+————+————+<br>| CLARK | 1981-06-09 | KING  | 1981-11-17 | ACCOUNTING |<br>| SMITH | 1980-12-17 | FORD  | 1981-12-03 | RESEARCH   |<br>| JONES | 1981-04-02 | KING  | 1981-11-17 | RESEARCH   |<br>| ALLEN | 1981-02-20 | BLAKE | 1981-05-01 | SALES      |<br>| WARD  | 1981-02-22 | BLAKE | 1981-05-01 | SALES      |<br>| BLAKE | 1981-05-01 | KING  | 1981-11-17 | SALES      |<br>+——-+————+——-+————+————+</p>
+<p>16、 列出部门名称和这些部门的员工信息, 同时列出那些没有员工的部门</p>
+<p>select<br>    e.*,d.dname<br>from<br>    emp e<br>right join<br>    dept d<br>on<br>    e.deptno = d.deptno;</p>
+<p>+——-+——–+———–+——+————+———+———+——–+————+<br>| EMPNO | ENAME  | JOB       | MGR  | HIREDATE   | SAL     | COMM    | DEPTNO | dname      |<br>+——-+——–+———–+——+————+———+———+——–+————+<br>|  7782 | CLARK  | MANAGER   | 7839 | 1981-06-09 | 2450.00 |    NULL |     10 | ACCOUNTING |<br>|  7839 | KING   | PRESIDENT | NULL | 1981-11-17 | 5000.00 |    NULL |     10 | ACCOUNTING |<br>|  7934 | MILLER | CLERK     | 7782 | 1982-01-23 | 1300.00 |    NULL |     10 | ACCOUNTING |<br>|  7369 | SMITH  | CLERK     | 7902 | 1980-12-17 |  800.00 |    NULL |     20 | RESEARCH   |<br>|  7566 | JONES  | MANAGER   | 7839 | 1981-04-02 | 2975.00 |    NULL |     20 | RESEARCH   |<br>|  7788 | SCOTT  | ANALYST   | 7566 | 1987-04-19 | 3000.00 |    NULL |     20 | RESEARCH   |<br>|  7876 | ADAMS  | CLERK     | 7788 | 1987-05-23 | 1100.00 |    NULL |     20 | RESEARCH   |<br>|  7902 | FORD   | ANALYST   | 7566 | 1981-12-03 | 3000.00 |    NULL |     20 | RESEARCH   |<br>|  7499 | ALLEN  | SALESMAN  | 7698 | 1981-02-20 | 1600.00 |  300.00 |     30 | SALES      |<br>|  7521 | WARD   | SALESMAN  | 7698 | 1981-02-22 | 1250.00 |  500.00 |     30 | SALES      |<br>|  7654 | MARTIN | SALESMAN  | 7698 | 1981-09-28 | 1250.00 | 1400.00 |     30 | SALES      |<br>|  7698 | BLAKE  | MANAGER   | 7839 | 1981-05-01 | 2850.00 |    NULL |     30 | SALES      |<br>|  7844 | TURNER | SALESMAN  | 7698 | 1981-09-08 | 1500.00 |    0.00 |     30 | SALES      |<br>|  7900 | JAMES  | CLERK     | 7698 | 1981-12-03 |  950.00 |    NULL |     30 | SALES      |<br>|  NULL | NULL   | NULL      | NULL | NULL       |    NULL |    NULL |   NULL | OPERATIONS |<br>+——-+——–+———–+——+————+———+———+——–+————+</p>
+<p>17、列出至少有 5 个员工的所有部门<br>按照部门编号分组，计数，筛选出 &gt;= 5</p>
+<p>select<br>    deptno<br>from<br>    emp<br>group by<br>    deptno<br>having<br>    count(*) &gt;= 5;</p>
+<p>+——–+<br>| deptno |<br>+——–+<br>|     20 |<br>|     30 |<br>+——–+</p>
+<p>18、列出薪金比”SMITH” 多的所有员工信息</p>
+<p>select ename,sal from emp where sal &gt; (select sal from emp where ename = ‘SMITH’);<br>+——–+———+<br>| ename  | sal     |<br>+——–+———+<br>| ALLEN  | 1600.00 |<br>| WARD   | 1250.00 |<br>| JONES  | 2975.00 |<br>| MARTIN | 1250.00 |<br>| BLAKE  | 2850.00 |<br>| CLARK  | 2450.00 |<br>| SCOTT  | 3000.00 |<br>| KING   | 5000.00 |<br>| TURNER | 1500.00 |<br>| ADAMS  | 1100.00 |<br>| JAMES  |  950.00 |<br>| FORD   | 3000.00 |<br>| MILLER | 1300.00 |<br>+——–+———+</p>
+<p>19、 列出所有”CLERK”( 办事员) 的姓名及其部门名称, 部门的人数<br>select ename,job from emp where job = ‘CLERK’;<br>+——–+——-+<br>| ename  | job   |<br>+——–+——-+<br>| SMITH  | CLERK |<br>| ADAMS  | CLERK |<br>| JAMES  | CLERK |<br>| MILLER | CLERK |<br>+——–+——-+</p>
+<p>select<br>    e.ename,e.job,d.dname<br>from<br>    emp e<br>join<br>    dept d<br>on<br>    e.deptno = d.deptno<br>where<br>    e.job = ‘CLERK’;</p>
+<p>+——–+——-+————+<br>| ename  | job   | dname      |<br>+——–+——-+————+<br>| MILLER | CLERK | ACCOUNTING |<br>| SMITH  | CLERK | RESEARCH   |<br>| ADAMS  | CLERK | RESEARCH   |<br>| JAMES  | CLERK | SALES      |<br>+——–+——-+————+</p>
+<p>select<br>    e.ename,e.job,d.dname,d.deptno<br>from<br>    emp e<br>join<br>    dept d<br>on<br>    e.deptno = d.deptno<br>where<br>    e.job = ‘CLERK’;</p>
+<p>+——–+——-+————+——–+<br>| ename  | job   | dname      | deptno |<br>+——–+——-+————+——–+<br>| MILLER | CLERK | ACCOUNTING |     10 |<br>| SMITH  | CLERK | RESEARCH   |     20 |<br>| ADAMS  | CLERK | RESEARCH   |     20 |<br>| JAMES  | CLERK | SALES      |     30 |<br>+——–+——-+————+——–+</p>
+<p>//每个部门的人数？<br>select deptno, count(*) as deptcount from emp group by deptno;<br>+——–+———–+<br>| deptno | deptcount |<br>+——–+———–+<br>|     10 |         3 |<br>|     20 |         5 |<br>|     30 |         6 |<br>+——–+———–+</p>
+<p>select<br>    t1.<em>,t2.deptcount<br>from<br>    (select<br>        e.ename,e.job,d.dname,d.deptno<br>    from<br>        emp e<br>    join<br>        dept d<br>    on<br>        e.deptno = d.deptno<br>    where<br>        e.job = ‘CLERK’) t1<br>join<br>    (select deptno, count(</em>) as deptcount from emp group by deptno) t2<br>on<br>    t1.deptno = t2.deptno;</p>
+<p>+——–+——-+————+——–+———–+<br>| ename  | job   | dname      | deptno | deptcount |<br>+——–+——-+————+——–+———–+<br>| MILLER | CLERK | ACCOUNTING |     10 |         3 |<br>| SMITH  | CLERK | RESEARCH   |     20 |         5 |<br>| ADAMS  | CLERK | RESEARCH   |     20 |         5 |<br>| JAMES  | CLERK | SALES      |     30 |         6 |<br>+——–+——-+————+——–+———–+</p>
+<p>20、列出最低薪金大于 1500 的各种工作及从事此工作的全部雇员人数<br>按照工作岗位分组求最小值。<br>select job,count(*) from emp group by job having min(sal) &gt; 1500;</p>
+<p>+———–+———-+<br>| job       | count(*) |<br>+———–+———-+<br>| ANALYST   |        2 |<br>| MANAGER   |        3 |<br>| PRESIDENT |        1 |<br>+———–+———-+</p>
+<p>21、列出在部门”SALES”&lt; 销售部&gt; 工作的员工的姓名, 假定不知道销售部的部门编号.</p>
+<p>select ename from emp where deptno = (select deptno from dept where dname = ‘SALES’);</p>
+<p>+——–+<br>| ename  |<br>+——–+<br>| ALLEN  |<br>| WARD   |<br>| MARTIN |<br>| BLAKE  |<br>| TURNER |<br>| JAMES  |<br>+——–+</p>
+<p>22、列出薪金高于公司平均薪金的所有员工, 所在部门, 上级领导, 雇员的工资等级.</p>
+<p>select<br>    e.ename ‘员工’,d.dname,l.ename ‘领导’,s.grade<br>from<br>    emp e<br>join<br>    dept d<br>on<br>    e.deptno = d.deptno<br>left join<br>    emp l<br>on<br>    e.mgr = l.empno<br>join<br>    salgrade s<br>on<br>    e.sal between s.losal and s.hisal<br>where<br>    e.sal &gt; (select avg(sal) from emp);</p>
+<p>+——-+————+——-+——-+<br>| 员工     | dname      | 领导    | grade |<br>+——-+————+——-+——-+<br>| JONES | RESEARCH   | KING  |     4 |<br>| BLAKE | SALES      | KING  |     4 |<br>| CLARK | ACCOUNTING | KING  |     4 |<br>| SCOTT | RESEARCH   | JONES |     4 |<br>| KING  | ACCOUNTING | NULL  |     5 |<br>| FORD  | RESEARCH   | JONES |     4 |<br>+——-+————+——-+——-+</p>
+<p>23、 列出与”SCOTT” 从事相同工作的所有员工及部门名称<br>select job from emp where ename = ‘SCOTT’;<br>+———+<br>| job     |<br>+———+<br>| ANALYST |<br>+———+</p>
+<p>select<br>    e.ename,e.job,d.dname<br>from<br>    emp e<br>join<br>    dept d<br>on<br>    e.deptno = d.deptno<br>where<br>    e.job = (select job from emp where ename = ‘SCOTT’)<br>and<br>    e.ename &lt;&gt; ‘SCOTT’;</p>
+<p>+——-+———+———-+<br>| ename | job     | dname    |<br>+——-+———+———-+<br>| FORD  | ANALYST | RESEARCH |<br>+——-+———+———-+</p>
+<p>24、列出薪金等于部门 30 中员工的薪金的其他员工的姓名和薪金.<br>select distinct sal from emp where deptno = 30;<br>+———+<br>| sal     |<br>+———+<br>| 1600.00 |<br>| 1250.00 |<br>| 2850.00 |<br>| 1500.00 |<br>|  950.00 |<br>+———+</p>
+<p>select<br>    ename,sal<br>from<br>    emp<br>where<br>    sal in(select distinct sal from emp where deptno = 30)<br>and<br>    deptno &lt;&gt; 30;</p>
+<p>Empty set (0.00 sec)</p>
+<p>25、列出薪金高于在部门 30 工作的所有员工的薪金的员工姓名和薪金. 部门名称<br>select max(sal) from emp where deptno = 30;<br>+———-+<br>| max(sal) |<br>+———-+<br>|  2850.00 |<br>+———-+</p>
+<p>select<br>    e.ename,e.sal,d.dname<br>from<br>    emp e<br>join<br>    dept d<br>on<br>    e.deptno = d.deptno<br>where<br>    e.sal &gt; (select max(sal) from emp where deptno = 30);</p>
+<p>+——-+———+————+<br>| ename | sal     | dname      |<br>+——-+———+————+<br>| KING  | 5000.00 | ACCOUNTING |<br>| JONES | 2975.00 | RESEARCH   |<br>| SCOTT | 3000.00 | RESEARCH   |<br>| FORD  | 3000.00 | RESEARCH   |<br>+——-+———+————+</p>
+<p>26、列出在每个部门工作的员工数量, 平均工资和平均服务期限</p>
+<p>没有员工的部门，部门人数是0</p>
+<p>select<br>    d.deptno, count(e.ename) ecount,ifnull(avg(e.sal),0) as avgsal, ifnull(avg(timestampdiff(YEAR, hiredate, now())), 0) as avgservicetime<br>from<br>    emp e<br>right join<br>    dept d<br>on<br>    e.deptno = d.deptno<br>group by<br>    d.deptno;</p>
+<p>+——–+——–+————-+—————-+<br>| deptno | ecount | avgsal      | avgservicetime |<br>+——–+——–+————-+—————-+<br>|     10 |      3 | 2916.666667 |        38.0000 |<br>|     20 |      5 | 2175.000000 |        35.8000 |<br>|     30 |      6 | 1566.666667 |        38.3333 |<br>|     40 |      0 |    0.000000 |         0.0000 |<br>+——–+——–+————-+—————-+</p>
+<p>在mysql当中怎么计算两个日期的“年差”，差了多少年？<br>    TimeStampDiff(间隔类型, 前一个日期, 后一个日期)</p>
+<pre><code>timestampdiff(YEAR, hiredate, now())
+
+间隔类型：
+    SECOND   秒，
+    MINUTE   分钟，
+    HOUR   小时，
+    DAY   天，
+    WEEK   星期
+    MONTH   月，
+    QUARTER   季度，
+    YEAR   年
+</code></pre>
+<p>27、 列出所有员工的姓名、部门名称和工资。<br>select<br>    e.ename,d.dname,e.sal<br>from<br>    emp e<br>join<br>    dept d<br>on<br>    e.deptno = d.deptno;</p>
+<p>+——–+————+———+<br>| ename  | dname      | sal     |<br>+——–+————+———+<br>| CLARK  | ACCOUNTING | 2450.00 |<br>| KING   | ACCOUNTING | 5000.00 |<br>| MILLER | ACCOUNTING | 1300.00 |<br>| SMITH  | RESEARCH   |  800.00 |<br>| JONES  | RESEARCH   | 2975.00 |<br>| SCOTT  | RESEARCH   | 3000.00 |<br>| ADAMS  | RESEARCH   | 1100.00 |<br>| FORD   | RESEARCH   | 3000.00 |<br>| ALLEN  | SALES      | 1600.00 |<br>| WARD   | SALES      | 1250.00 |<br>| MARTIN | SALES      | 1250.00 |<br>| BLAKE  | SALES      | 2850.00 |<br>| TURNER | SALES      | 1500.00 |<br>| JAMES  | SALES      |  950.00 |<br>+——–+————+———+</p>
+<p>28、列出所有部门的详细信息和人数</p>
+<p>select<br>    d.deptno,d.dname,d.loc,count(e.ename)<br>from<br>    emp e<br>right join<br>    dept d<br>on<br>    e.deptno = d.deptno<br>group by<br>    d.deptno,d.dname,d.loc;</p>
+<p>+——–+————+———-+—————-+<br>| deptno | dname      | loc      | count(e.ename) |<br>+——–+————+———-+—————-+<br>|     10 | ACCOUNTING | NEW YORK |              3 |<br>|     20 | RESEARCH   | DALLAS   |              5 |<br>|     30 | SALES      | CHICAGO  |              6 |<br>|     40 | OPERATIONS | BOSTON   |              0 |<br>+——–+————+———-+—————-+</p>
+<p>29、列出各种工作的最低工资及从事此工作的雇员姓名<br>select<br>    job,min(sal) as minsal<br>from<br>    emp<br>group by<br>    job;</p>
+<p>+———–+———-+<br>| job       | minsal        |<br>+———–+———-+<br>| ANALYST   |  3000.00 |<br>| CLERK     |   800.00 |<br>| MANAGER   |  2450.00 |<br>| PRESIDENT |  5000.00 |<br>| SALESMAN  |  1250.00 |<br>+———–+———-+</p>
+<p>emp e和以上t连接</p>
+<p>select<br>    e.ename,t.*<br>from<br>    emp e<br>join<br>    (select<br>        job,min(sal) as minsal<br>    from<br>        emp<br>    group by<br>        job) t<br>on<br>    e.job = t.job and e.sal = t.minsal;</p>
+<p>+——–+———–+———+<br>| ename  | job       | minsal  |<br>+——–+———–+———+<br>| SMITH  | CLERK     |  800.00 |<br>| WARD   | SALESMAN  | 1250.00 |<br>| MARTIN | SALESMAN  | 1250.00 |<br>| CLARK  | MANAGER   | 2450.00 |<br>| SCOTT  | ANALYST   | 3000.00 |<br>| KING   | PRESIDENT | 5000.00 |<br>| FORD   | ANALYST   | 3000.00 |<br>+——–+———–+———+</p>
+<p>30、列出各个部门的 MANAGER( 领导) 的最低薪金<br>select<br>    deptno, min(sal)<br>from<br>    emp<br>where<br>    job = ‘MANAGER’<br>group by<br>    deptno;</p>
+<p>+——–+———-+<br>| deptno | min(sal) |<br>+——–+———-+<br>|     10 |  2450.00 |<br>|     20 |  2975.00 |<br>|     30 |  2850.00 |<br>+——–+———-+</p>
+<p>31、列出所有员工的 年工资, 按 年薪从低到高排序</p>
+<p>select<br>    ename,(sal + ifnull(comm,0)) * 12 as yearsal<br>from<br>    emp<br>order by<br>    yearsal asc;</p>
+<p>+——–+———-+<br>| ename  | yearsal  |<br>+——–+———-+<br>| SMITH  |  9600.00 |<br>| JAMES  | 11400.00 |<br>| ADAMS  | 13200.00 |<br>| MILLER | 15600.00 |<br>| TURNER | 18000.00 |<br>| WARD   | 21000.00 |<br>| ALLEN  | 22800.00 |<br>| CLARK  | 29400.00 |<br>| MARTIN | 31800.00 |<br>| BLAKE  | 34200.00 |<br>| JONES  | 35700.00 |<br>| FORD   | 36000.00 |<br>| SCOTT  | 36000.00 |<br>| KING   | 60000.00 |<br>+——–+———-+</p>
+<p>32、求出员工领导的薪水超过3000的员工名称与领导</p>
+<p>select<br>    a.ename ‘员工’,b.ename ‘领导’<br>from<br>    emp a<br>join<br>    emp b<br>on<br>    a.mgr = b.empno<br>where<br>    b.sal &gt; 3000;</p>
+<p>+——-+——+<br>| 员工  | 领导   |<br>+——-+——+<br>| JONES | KING |<br>| BLAKE | KING |<br>| CLARK | KING |<br>+——-+——+</p>
+<p>33、求出部门名称中, 带’S’字符的部门员工的工资合计、部门人数</p>
+<p>select<br>    d.deptno,d.dname,d.loc,count(e.ename),ifnull(sum(e.sal),0) as sumsal<br>from<br>    emp e<br>right join<br>    dept d<br>on<br>    e.deptno = d.deptno<br>where<br>    d.dname like ‘%S%’<br>group by<br>    d.deptno,d.dname,d.loc;</p>
+<p>+——–+————+———+—————-+———-+<br>| deptno | dname      | loc     | count(e.ename) | sumsal   |<br>+——–+————+———+—————-+———-+<br>|     20 | RESEARCH   | DALLAS  |              5 | 10875.00 |<br>|     30 | SALES      | CHICAGO |              6 |  9400.00 |<br>|     40 | OPERATIONS | BOSTON  |              0 |     0.00 |<br>+——–+————+———+—————-+———-+</p>
+<p>34、给任职日期超过 30 年的员工加薪 10%.</p>
+<p>update emp set sal = sal * 1.1 where timestampdiff(YEAR, hiredate, now()) &gt; 30;</p>
 
       
 
@@ -596,7 +844,7 @@ order by 排序的字段|表达式|函数|别名 【asc|desc】
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">java</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">MySql数据库</a>
         		</li>
       		
 		</ul>
@@ -666,6 +914,15 @@ order by 排序的字段|表达式|函数|别名 【asc|desc】
   
 <nav id="article-nav">
   
+    <a href="/2021/07/25/MySQL%E9%9D%A2%E8%AF%95%E9%A2%98%E6%B1%87%E6%80%BB/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          MySQL面试题汇总
+        
+      </div>
+    </a>
+  
   
     <a href="/2021/07/13/%E5%9F%BA%E4%BA%8Essm%E5%9B%BE%E4%B9%A6%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F/" id="article-nav-older" class="article-nav-link-wrap">
       <div class="article-nav-title">基于ssm图书管理系统</div>
@@ -695,7 +952,7 @@ order by 排序的字段|表达式|函数|别名 【asc|desc】
                 </span>
                 <span class="tooltip-content">
                     <div class="toc-article">
-                    目录，不存在的…
+                    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94MYSQL%E7%BB%83%E4%B9%A0%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94%E2%80%94"><span class="toc-number">1.</span> <span class="toc-text">———————————MYSQL练习———————————</span></a></li></ol>
                     </div>
                 </span>
             </div>
@@ -832,11 +1089,27 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">java</a>
+                <a href="javascript:void(0)" class="js-tag color2">java项目</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">java项目</a>
+                <a href="javascript:void(0)" class="js-tag color4">MySql数据库</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">框架</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">javase</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">javaee</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">linux</a>
               </li>
             
             <div class="clearfix"></div>
